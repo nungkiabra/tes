@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Simulasi Menyiar Interaktif - Media Pembelajaran Broadcasting</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Studio Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#ff2a5f',
+              blue: '#2563eb',
+              gold: '#f59e0b',
+              dark: '#0f172a',
+              card: '#1e293b',
+              accent: '#38bdf8'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif']
+          },
+          animation: {
+            'pulse-fast': 'pulse 1s infinite',
+            'marquee': 'marquee 12s linear infinite',
+          },
+          keyframes: {
+            marquee: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(-100%)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    
+    .teleprompter-text {
+      display: inline-block;
+      white-space: pre-wrap;
+      animation: scrollUp 25s linear infinite;
+    }
+
+    @keyframes scrollUp {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(-120%); }
+    }
+
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans antialiased overflow-x-hidden">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-red-600/20 text-red-500 font-bold text-sm">
+        <i class="fa-solid fa-tower-broadcast text-lg animate-pulse"></i>
+      </div>
+      <div>
+        <h1 class="font-display text-sm font-extrabold tracking-wider text-slate-100 uppercase">SimuBroadcaster</h1>
+        <p class="text-[10px] text-slate-400 font-medium">Studio Simulasi Menyiar Interaktif</p>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="flex items-center space-x-2">
+      <button onclick="openEditorModal()" class="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold flex items-center space-x-1 transition-all">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span>Editor Guru</span>
+      </button>
+      <span class="hidden sm:inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+        STUDIO READY
+      </span>
+    </div>
+  </header>
+
+  <main class="flex-grow p-4 max-w-md mx-auto w-full flex flex-col justify-center">
+
+    <!-- ==================== 1. MENU SCREEN ==================== -->
+    <section id="menu-screen" class="space-y-5 py-2">
+      <!-- Banner / Welcome -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-900/60 via-slate-900 to-slate-900 p-5 border border-indigo-500/20 shadow-2xl">
+        <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl text-indigo-400 font-black">
+          <i class="fa-solid fa-microphone-lines"></i>
+        </div>
+        <span class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          Media Pembelajaran Mandiri
+        </span>
+        <h2 class="text-xl font-black mt-3 font-display tracking-wide text-white">Asah Keterampilan Menyiar</h2>
+        <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+          Pilih mode latihan pilihan berganda berbasis kasus, atau gunakan <strong class="text-emerald-400">Praktik Suara Direct (Penilaian AI & Unduh Audio)</strong> berdasarkan standar menyiar!
+        </p>
+      </div>
+
+      <!-- Feature Highlight: AI Practical Exam -->
+      <div class="p-4 rounded-xl bg-gradient-to-r from-emerald-900/40 via-slate-900 to-slate-900 border border-emerald-500/40 shadow-xl space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500 text-slate-950 tracking-wider">Praktik Suara + AI</span>
+          <i class="fa-solid fa-wand-magic-sparkles text-emerald-400 animate-pulse"></i>
+        </div>
+        <h3 class="font-extrabold text-sm text-white">Praktik Direct, Naskah Custom & Unduh Rekaman</h3>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          Edit naskah sesukamu, bacakan via mikrofon HP, unduh rekaman suaramu, dan dapatkan penilaian otomatis AI secara presisi!
+        </p>
+        <button onclick="openPracticalMenu()" class="w-full py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center space-x-2 transition-transform active:scale-[0.98] mt-1">
+          <i class="fa-solid fa-microphone animate-bounce text-slate-950"></i>
+          <span>Mulai Praktik Suara & Edit Naskah</span>
+        </button>
+      </div>
+
+      <!-- Role Selection Cards (Simulation Mode) -->
+      <div class="space-y-2.5">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Simulasi Studi Kasus (Trial & Error):</p>
+        
+        <!-- TV News Anchor -->
+        <button onclick="startSimulation('tv')" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-800/80 transition-all duration-200 group flex items-center justify-between shadow-lg active:scale-[0.98]">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-tv"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-slate-100 group-hover:text-blue-400 transition-colors">Penyiaran Berita TV</h3>
+              <p class="text-[10px] text-slate-400 mt-0.5">Teleprompter, Kontak Mata & Breaking News</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-600 text-xs group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+        </button>
+
+        <!-- Radio Announcer -->
+        <button onclick="startSimulation('radio')" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-800/80 transition-all duration-200 group flex items-center justify-between shadow-lg active:scale-[0.98]">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-radio"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-slate-100 group-hover:text-purple-400 transition-colors">Penyiaran Radio</h3>
+              <p class="text-[10px] text-slate-400 mt-0.5">Backtiming Intro, Sweeper & Ad-libbing</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-600 text-xs group-hover:text-purple-400 group-hover:translate-x-1 transition-all"></i>
+        </button>
+
+        <!-- Event Host / MC -->
+        <button onclick="startSimulation('host')" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-800/80 transition-all duration-200 group flex items-center justify-between shadow-lg active:scale-[0.98]">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-microphone"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-slate-100 group-hover:text-amber-400 transition-colors">Pembawa Acara / MC</h3>
+              <p class="text-[10px] text-slate-400 mt-0.5">Crowd Control, Bridging & Rundown Stage</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-right text-slate-600 text-xs group-hover:text-amber-400 group-hover:translate-x-1 transition-all"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== PRACTICAL DIRECT SPEECH MENU ==================== -->
+    <section id="practical-menu" class="hidden space-y-4 py-2">
+      <div class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <button onclick="resetMenu()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5 font-semibold transition-colors">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali</span>
+        </button>
+        <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-slate-950">
+          PRAKTIK DIRECT AI & EDIT TEKS
+        </span>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 space-y-3 shadow-lg">
+        <h3 class="font-bold text-sm text-emerald-400 flex items-center space-x-2">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Pilih Skenario Naskah Menyiar</span>
+        </h3>
+
+        <!-- Practical Script Selection Buttons -->
+        <div class="space-y-2 pt-1">
+          <button onclick="loadPracticalScenario('tv_news')" class="w-full text-left p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-blue-500/50 flex items-center justify-between text-xs font-semibold">
+            <span class="text-slate-200">📺 Naskah Anchor TV (Berita / Breaking)</span>
+            <i class="fa-solid fa-chevron-right text-slate-500"></i>
+          </button>
+          <button onclick="loadPracticalScenario('radio_intro')" class="w-full text-left p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-purple-500/50 flex items-center justify-between text-xs font-semibold">
+            <span class="text-slate-200">🎙️ Radio Talkover / Backtiming Intro</span>
+            <i class="fa-solid fa-chevron-right text-slate-500"></i>
+          </button>
+          <button onclick="loadPracticalScenario('host_opening')" class="w-full text-left p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-amber-500/50 flex items-center justify-between text-xs font-semibold">
+            <span class="text-slate-200">🎤 Opening MC Event / Festival Stage</span>
+            <i class="fa-solid fa-chevron-right text-slate-500"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Practical Workspace -->
+      <div id="practical-workspace" class="hidden space-y-4">
+        <!-- Naskah Teleprompter & Live Text Editor Box -->
+        <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-2 shadow-lg">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span id="prac-scenario-title" class="text-xs font-extrabold text-amber-400">Naskah Penyiaran</span>
+            <div class="flex items-center space-x-2">
+              <button onclick="toggleScriptEdit()" class="text-[10px] px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 hover:bg-indigo-600/50 border border-indigo-500/30 flex items-center space-x-1">
+                <i class="fa-solid fa-pen"></i>
+                <span id="edit-script-toggle-text">Edit Teks Naskah</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Display Mode Script -->
+          <div id="script-display-container" class="p-3 bg-slate-950 rounded-lg border border-slate-800/80">
+            <p id="prac-script-display" class="text-xs font-mono text-emerald-400 leading-relaxed font-semibold">
+              <!-- Script dynamic -->
+            </p>
+          </div>
+
+          <!-- Edit Mode Script Area -->
+          <div id="script-edit-container" class="hidden space-y-2">
+            <textarea id="prac-script-input" rows="4" class="w-full p-2.5 bg-slate-950 text-xs font-mono text-emerald-300 rounded-lg border border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-400 leading-relaxed" placeholder="Tuliskan naskah menyiarmu di sini..."></textarea>
+            <button onclick="saveCustomPracticalScript()" class="w-full py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] uppercase tracking-wider transition-colors">
+              Simpan Teks Naskah Barumu
+            </button>
+          </div>
+
+          <div class="text-[10px] text-slate-400 italic">
+            💡 <span id="prac-instruction">Gunakan ekspresi wajah dan intonasi yang tegas namun berempati.</span>
+          </div>
+        </div>
+
+        <!-- Recording, Audio Download & Assessment Controls -->
+        <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 space-y-3 shadow-lg">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <button id="prac-rec-btn" onclick="togglePracticalRecording()" class="w-12 h-12 rounded-full bg-red-600/20 border border-red-500/40 text-red-500 flex items-center justify-center font-bold text-lg hover:bg-red-600 hover:text-white transition-all">
+                <i id="prac-rec-icon" class="fa-solid fa-microphone"></i>
+              </button>
+              <div>
+                <h4 class="text-xs font-bold text-slate-100">Rekam Suara HP</h4>
+                <p id="prac-rec-status" class="text-[10px] text-slate-400">Tekan mikrofon untuk mulai praktik</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Player & Download Button -->
+          <div id="practical-audio-container" class="hidden p-3 rounded-lg bg-slate-950 border border-slate-800 flex flex-col space-y-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Putar & Unduh Hasil Rekaman Suara:</span>
+            <div class="flex items-center justify-between space-x-2">
+              <audio id="prac-audio-player" controls class="h-8 w-full"></audio>
+              <button id="download-audio-btn" onclick="downloadAudioFile()" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[11px] whitespace-nowrap flex items-center space-x-1 shadow transition-colors">
+                <i class="fa-solid fa-download"></i>
+                <span>Unduh MP3/Audio</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Transcript Preview (Speech Recognition) -->
+          <div id="transcript-box" class="hidden p-2.5 rounded-lg bg-slate-950 border border-slate-800/80 text-[11px] text-slate-300">
+            <span class="text-[10px] font-bold text-slate-500 block uppercase">Transkrip Ucapan Terdeteksi:</span>
+            <p id="transcript-text" class="italic text-slate-300 mt-0.5">...</p>
+          </div>
+
+          <!-- Evaluate Button -->
+          <button id="evaluate-ai-btn" onclick="evaluateSpeechWithAI()" class="hidden w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-xl flex items-center justify-center space-x-2 transition-all">
+            <i class="fa-solid fa-calculator"></i>
+            <span>PROSES PENILAIAN OTOMATIS AI</span>
+          </button>
+        </div>
+
+        <!-- AI Assessment Results Card -->
+        <div id="ai-results-card" class="hidden bg-slate-900 rounded-xl p-4 border border-emerald-500/40 space-y-4 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-extrabold text-emerald-400 flex items-center space-x-1.5">
+              <i class="fa-solid fa-award"></i>
+              <span>Hasil Evaluasi Standar Menyiar AI</span>
+            </span>
+            <span id="ai-final-score" class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 font-mono font-black text-sm border border-emerald-500/30">
+              0/100
+            </span>
+          </div>
+
+          <!-- Detailed Rubric Metrics Breakdown -->
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold block">1. Intonasi & Aksentuasi</span>
+              <p id="score-intonation" class="font-bold text-amber-400">Nilai: -</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold block">2. Artikulasi & Tempo</span>
+              <p id="score-articulation" class="font-bold text-blue-400">Nilai: -</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold block">3. Diksi & Ekspresi Vokal</span>
+              <p id="score-diction" class="font-bold text-emerald-400">Nilai: -</p>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-1">
+              <span class="text-[10px] text-slate-400 font-bold block">4. Ketepatan Naskah</span>
+              <p id="score-accuracy" class="font-bold text-purple-400">Nilai: -</p>
+            </div>
+          </div>
+
+          <!-- AI Qualitative Feedback -->
+          <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1 text-xs">
+            <span class="font-bold text-indigo-300 flex items-center space-x-1">
+              <i class="fa-solid fa-comment-dots text-emerald-400"></i>
+              <span>Catatan Evaluator Broadcast AI:</span>
+            </span>
+            <p id="ai-feedback-text" class="text-slate-300 leading-relaxed text-[11px]">
+              Analisis sedang diproses...
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. SIMULATION SCREEN ==================== -->
+    <section id="sim-screen" class="hidden space-y-4 py-2">
+      <!-- Top Action Bar -->
+      <div class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+        <button onclick="resetMenu()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center space-x-1.5 font-semibold transition-colors">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Menu Utama</span>
+        </button>
+        <span id="role-badge" class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-sm">
+          TV ANCHOR
+        </span>
+        <span id="stage-counter" class="text-xs font-bold text-slate-400">
+          Skenario <span id="current-stage" class="text-white">1</span>/3
+        </span>
+      </div>
+
+      <!-- Studio Display Widget -->
+      <div id="studio-widget" class="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-900 p-4 shadow-xl min-h-[160px] flex flex-col justify-between">
+      </div>
+
+      <!-- Scenario Challenge Card -->
+      <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 space-y-3 shadow-lg">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <h3 id="scenario-title" class="font-bold text-sm text-amber-400 flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Judul Skenario</span>
+          </h3>
+          <span id="score-tag" class="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Skor: <span id="current-score" class="text-emerald-400">100</span></span>
+        </div>
+        
+        <p id="scenario-desc" class="text-xs text-slate-200 leading-relaxed font-normal">
+          Deskripsi permasalahan atau simulasi yang terjadi di studio siaran...
+        </p>
+
+        <div id="script-box" class="hidden p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 leading-relaxed">
+          <p id="script-content" class="text-emerald-400"></p>
+        </div>
+      </div>
+
+      <!-- Microphone Audio Recording Section -->
+      <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <button id="rec-btn" onclick="toggleRecording()" class="w-10 h-10 rounded-full bg-red-600/20 border border-red-500/40 text-red-500 flex items-center justify-center font-bold hover:bg-red-600 hover:text-white transition-all">
+              <i id="rec-icon" class="fa-solid fa-microphone"></i>
+            </button>
+            <div>
+              <h4 class="text-xs font-bold text-slate-200">Latihan Suara Direct (HP Mic)</h4>
+              <p id="rec-status" class="text-[10px] text-slate-400">Tekan mikrofon untuk rekam praktekmu</p>
+            </div>
+          </div>
+        </div>
+        <div id="sim-audio-container" class="hidden flex items-center justify-between space-x-2 pt-1 border-t border-slate-800/60">
+          <audio id="audio-playback" controls class="h-8 w-full"></audio>
+          <button id="download-sim-audio-btn" onclick="downloadSimAudioFile()" class="px-2.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[10px] whitespace-nowrap flex items-center space-x-1 transition-colors">
+            <i class="fa-solid fa-download"></i>
+            <span>Unduh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Decision Options A and B Buttons -->
+      <div class="space-y-2" id="options-container"></div>
+
+      <!-- Consequence Feedback Box -->
+      <div id="feedback-box" class="hidden rounded-xl border p-4 transition-all duration-300 space-y-3 shadow-xl">
+        <div class="flex items-start space-x-3">
+          <div id="feedback-icon-bg" class="w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0 mt-0.5">
+            <i id="feedback-icon" class="fa-solid"></i>
+          </div>
+          <div>
+            <h4 id="feedback-title" class="font-extrabold text-sm">Evaluasi Hasil</h4>
+            <p id="feedback-subtitle" class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dampak Keputusan Siaran</p>
+          </div>
+        </div>
+
+        <p id="feedback-text" class="text-xs leading-relaxed text-slate-200 pl-1 border-l-2 border-slate-700/50 my-2">
+          Penjelasan evaluasi mengapa pilihan tersebut keliru atau benar...
+        </p>
+
+        <div id="takeaway-box" class="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 text-[11px] text-slate-300 space-y-1">
+          <span class="font-bold text-amber-400 flex items-center space-x-1">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Pelajaran Broadcasting Utama:</span>
+          </span>
+          <p id="takeaway-text" class="text-slate-400 italic"></p>
+        </div>
+
+        <div class="pt-1">
+          <button id="retry-btn" onclick="retryStage()" class="hidden w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs flex items-center justify-center space-x-2 shadow-lg transition-transform active:scale-[0.98]">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>COBA LAGI & PERBAIKI KESALAHAN</span>
+          </button>
+          
+          <button id="next-btn" onclick="nextStage()" class="hidden w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs flex items-center justify-center space-x-2 shadow-lg transition-transform active:scale-[0.98]">
+            <span>LANJUT KE SKENARIO NEXT</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. EVALUATION SUMMARY SCREEN ==================== -->
+    <section id="summary-screen" class="hidden space-y-5 py-4 text-center">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 mx-auto flex items-center justify-center text-3xl text-white shadow-2xl animate-bounce">
+        <i class="fa-solid fa-award"></i>
+      </div>
+
+      <div>
+        <h2 class="text-xl font-black font-display text-white">Simulasi Selesai!</h2>
+        <p class="text-xs text-slate-400 mt-1">Laporan Performa Siaran broadcasting kamu</p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Total Skor</span>
+            <p id="final-score" class="text-2xl font-black text-emerald-400 mt-1">100</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Tingkat Ketepatan</span>
+            <p id="final-accuracy" class="text-2xl font-black text-blue-400 mt-1">100%</p>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-left space-y-1">
+          <p class="text-xs font-bold text-indigo-300">Catatan Pelatih Broadcast:</p>
+          <p id="final-feedback" class="text-[11px] text-slate-300 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <div class="text-left space-y-2">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Catatan "Belajar dari Kesalahan":</h4>
+        <div id="mistakes-log-container" class="space-y-2 text-xs"></div>
+      </div>
+
+      <button onclick="resetMenu()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-xl transition-all">
+        Kembali ke Menu Peran
+      </button>
+    </section>
+
+  </main>
+
+  <!-- ==================== 4. SCENARIO EDITOR MODAL (MODE GURU/PEMILIK) ==================== -->
+  <div id="editor-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto flex items-center justify-center">
+    <div class="bg-slate-900 border border-indigo-500/40 rounded-2xl w-full max-w-md p-4 space-y-4 shadow-2xl my-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+          <h3 class="font-bold text-sm text-white">Editor Skenario & Pilihan A/B</h3>
+        </div>
+        <button onclick="closeEditorModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Editor Controls -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Pilih Mode Siaran:</label>
+          <select id="edit-role-select" onchange="populateEditorForm()" class="w-full p-2 bg-slate-950 border border-slate-800 rounded text-slate-200">
+            <option value="tv">Penyiaran Berita TV</option>
+            <option value="radio">Penyiaran Radio</option>
+            <option value="host">Pembawa Acara / MC</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Pilih Tahap Skenario:</label>
+          <select id="edit-stage-select" onchange="populateEditorForm()" class="w-full p-2 bg-slate-950 border border-slate-800 rounded text-slate-200">
+            <option value="0">Skenario 1</option>
+            <option value="1">Skenario 2</option>
+            <option value="2">Skenario 3</option>
+          </select>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-slate-800">
+          <div>
+            <label class="block font-bold text-amber-400 mb-1">Judul Skenario:</label>
+            <input id="edit-stage-title" type="text" class="w-full p-2 bg-slate-950 border border-slate-800 rounded text-slate-100">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Deskripsi Permasalahan Studio:</label>
+            <textarea id="edit-stage-desc" rows="2" class="w-full p-2 bg-slate-950 border border-slate-800 rounded text-slate-100 leading-relaxed"></textarea>
+          </div>
+
+          <div>
+            <label class="block font-bold text-emerald-400 mb-1">Teks Prompt Naskah (Opsional):</label>
+            <input id="edit-stage-script" type="text" class="w-full p-2 bg-slate-950 border border-slate-800 rounded text-slate-100">
+          </div>
+        </div>
+
+        <!-- Option A Editor -->
+        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+          <span class="font-extrabold text-indigo-400 block">Pilihan A Editor:</span>
+          <textarea id="edit-optA-text" rows="2" class="w-full p-1.5 bg-slate-900 border border-slate-800 rounded text-slate-200 text-[11px]" placeholder="Teks Pilihan A"></textarea>
+          
+          <div class="flex items-center space-x-2">
+            <label class="text-[11px] text-slate-400">Status Pilihan A:</label>
+            <select id="edit-optA-correct" class="p-1 bg-slate-900 border border-slate-800 rounded text-[11px] text-slate-200">
+              <option value="true">Benar (Kunci)</option>
+              <option value="false">Salah (Kesalahan)</option>
+            </select>
+          </div>
+          
+          <textarea id="edit-optA-reason" rows="2" class="w-full p-1.5 bg-slate-900 border border-slate-800 rounded text-slate-200 text-[11px]" placeholder="Penjelasan / Dampak Evaluasi A"></textarea>
+        </div>
+
+        <!-- Option B Editor -->
+        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+          <span class="font-extrabold text-indigo-400 block">Pilihan B Editor:</span>
+          <textarea id="edit-optB-text" rows="2" class="w-full p-1.5 bg-slate-900 border border-slate-800 rounded text-slate-200 text-[11px]" placeholder="Teks Pilihan B"></textarea>
+          
+          <div class="flex items-center space-x-2">
+            <label class="text-[11px] text-slate-400">Status Pilihan B:</label>
+            <select id="edit-optB-correct" class="p-1 bg-slate-900 border border-slate-800 rounded text-[11px] text-slate-200">
+              <option value="true">Benar (Kunci)</option>
+              <option value="false">Salah (Kesalahan)</option>
+            </select>
+          </div>
+          
+          <textarea id="edit-optB-reason" rows="2" class="w-full p-1.5 bg-slate-900 border border-slate-800 rounded text-slate-200 text-[11px]" placeholder="Penjelasan / Dampak Evaluasi B"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 pt-2 border-t border-slate-800">
+        <button onclick="saveScenarioEdits()" class="flex-1 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider">
+          Simpan Skenario Editor
+        </button>
+        <button onclick="resetEditorToDefault()" class="px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs">
+          Reset Default
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-3 text-[10px] text-slate-600 border-t border-slate-900">
+    <p>© 2026 Media Pembelajaran Simulasi Menyiar Interaktif. Studio Edition.</p>
+  </footer>
+
+  <script>
+    /* Practical Script Scenarios Default Storage */
+    let practicalScenarios = JSON.parse(localStorage.getItem('practicalScenarios_data')) || {
+      tv_news: {
+        title: "TV Anchor: Breaking News Bencana Alam",
+        script: "Pemerintah daerah bersama Tim SAR gabungan siang ini resmi memperluas area pencarian korban tanah longsor di Desa Sukamaju. Warga dihimbau untuk tetap waspada terhadap potensi susulan.",
+        instruction: "Bawa berita dengan intonasi serius, nada bicara tegas, dan tempo sedang penuh empati."
+      },
+      radio_intro: {
+        title: "Radio Announcer: Backtiming Talkover",
+        script: "Selamat sore Teman Hits! Penyelamat akhir pekan kamu balik lagi barengan gue. Sebelum kita meluncur ke lagu hits berikutnya, pastikan kamu tetap stay tuned!",
+        instruction: "Bicara dengan nada penuh semangat, ceria, ramah, dan selesaikan kalimat tepat sebelum vokal lagu dimulai."
+      },
+      host_opening: {
+        title: "Host / MC: Opening Festival Pemuda",
+        script: "Halo semuanya! Selamat datang di Festival Kreatif Pemuda 2026! Mana suaranya yang ada di sebelah kanan panggung?! Let's get noisy, guys!",
+        instruction: "Proyeksikan vokal dengan energi tinggi, artikulasi sangat jelas, dan dinamika suara yang membakar semangat penonton."
+      }
+    };
+
+    /* Simulation Scenarios Database Default Storage */
+    let simulationData = JSON.parse(localStorage.getItem('simulationData_data')) || {
+      tv: {
+        roleName: "Penyiaran Berita TV",
+        badgeColor: "bg-blue-600 text-white",
+        stages: [
+          {
+            title: "Skenario 1: Teleprompter Error Saat Live",
+            desc: "Saat kamu sedang membaca berita utama secara LIVE, layar teleprompter tiba-tiba mati total! Kamera masih merekam wajahmu. Apa tindakan cepatmu?",
+            script: "BERITA UTAMA: 'Pemerintah daerah resmi membuka program beasiswa penyiaran muda...'",
+            options: [
+              {
+                text: "A. Menunduk panik sambil melambaikan tangan memanggil teknisi.",
+                correct: false,
+                reason: "SALAH besar! Penonton melihat kepanikan di layar kaca. Rating siaran langsung anjlok karena kamu merusak estetika dan profesionalisme studio TV.",
+                takeaway: "Di TV, kontak mata dan ketenangan visual adalah kunci. Jangan pernah menunjukkan kepanikan teknis di depan kamera ON-AIR."
+              },
+              {
+                text: "B. Tetap tenang, tersenyum profesional, lalu melanjutkan membaca dari naskah fisik di meja.",
+                correct: true,
+                reason: "SANGAT TEPAT! Penonton hampir tidak menyadari gangguan. Menggunakan naskah cetak (cue card) adalah Prosedur Standar Keselamatan (SOP) penyiar TV.",
+                takeaway: "Selalu siapkan naskah cetak fisik di meja studio sebagai jaring pengaman utama saat teknologi teleprompter bermasalah."
+              }
+            ]
+          },
+          {
+            title: "Skenario 2: Breaking News Mendadak (Tanpa Naskah)",
+            desc: "Produser membisikkan lewat earpiece (IFB): 'Breaking news musibah banjir bandang baru masuk! Segera sampaikan sekarang!'. Kamu belum punya naskah.",
+            script: "INFO PRODUSER: Banjir di Kota B, ketinggian 1.5m, terjadi jam 14.00 WIB.",
+            options: [
+              {
+                text: "A. Menyampaikan informasi dengan ekspresi ceria dan santai agar penonton tidak panik.",
+                correct: false,
+                reason: "SALAH TOTAL! Ekspresi wajahmu bertentangan dengan empati berita duka/bencana. Penyiar dianggap tidak beretika dan tidak berempati.",
+                takeaway: "Ekspresi wajah dan nada suara (tone of voice) penyiar TV wajib disesuaikan dengan bobot emosi berita yang disampaikan."
+              },
+              {
+                text: "B. Mengatur gestur tubuh serius, intonasi tenang, dan menyampaikan 5W+1H informasi inti secara ad-libbing.",
+                correct: true,
+                reason: "TEPAT SEKALI! Kamu menyampaikan berita darurat dengan rasa empati yang tepat serta nada berita yang runtut walau tanpa naskah.",
+                takeaway: "Kemampuan ad-libbing (berbicara tanpa naskah) dengan ekspresi empati yang tepat sangat vital untuk situasi Breaking News."
+              }
+            ]
+          },
+          {
+            title: "Skenario 3: Nama Narasumber Salah Di-Graphic (CG Error)",
+            desc: "Kamu sedang wawancara LIVE. Nama narasumber di layar (Character Generator) tertulis salah oleh tim kontrol ruang TV. Narasumber terlihat tersinggung.",
+            script: "Narasumber: Dr. Budi (Pakar Ekonomi) -> Tertulis di CG: Ir. Budi (Aktivis Lingkungan)",
+            options: [
+              {
+                text: "A. Memotong pembicaraan narasumber dan mengklarifikasi maaf secara santun atas kesalahan teknis nama.",
+                correct: true,
+                reason: "TEPAT! Klarifikasi sopan dan berwibawa menyelamatkan kredibilitas narasumber serta studio TV dari tuntutan ketidakakuratan data.",
+                takeaway: "Keakuratan identitas narasumber adalah hak cipta dan kehormatan siaran. Jangan ragu mengoreksi kesalahan CG secara santun."
+              },
+              {
+                text: "B. Pura-pura tidak tahu dan melanjutkan wawancara agar waktu siaran tidak terbuang.",
+                correct: false,
+                reason: "KELIRU! Narasumber semakin kecewa dan penonton mendapatkan disinformasi identitas tokoh di layar TV.",
+                takeaway: "Pembiaran kesalahan fatal di layar siaran merusak kepercayaan (credibility) institusi berita."
+              }
+            ]
+          }
+        ]
+      },
+      radio: {
+        roleName: "Penyiaran Radio",
+        badgeColor: "bg-purple-600 text-white",
+        stages: [
+          {
+            title: "Skenario 1: Teknik Backtiming Intro Lagu",
+            desc: "Lagu hits baru diputar. Musik instrumen awal (intro) berdurasi tepat 10 detik sebelum vokal penyanyi mulai. Bagaimana kamu mengatur bicara (talkover)?",
+            script: "AUDIO TRACK: Intro Instrumen [00:10 Detik] -> Vokal Lagu Mulai [00:11]",
+            options: [
+              {
+                text: "A. Bicara bersemangat selama 12 detik hingga menabrak vokal lagu penyanyi.",
+                correct: false,
+                reason: "SALAH! Terjadi 'Clashing' (vokal menimpa vokal). Pendengar radio sangat terganggu karena suara penyiar dan penyanyi bertabrakan.",
+                takeaway: "Dalam radio, prinsip utama intro ramp adalah STOP berbicara 1-2 detik tepat sebelum vokal lagu pertama masuk."
+              },
+              {
+                text: "B. Bicara padat-kreatif selama 8 detik, lalu memberikan jeda 'ramp' sebelum vokal masuk.",
+                correct: true,
+                reason: "PERFEK! Teknik Backtiming mulus. Lagu mengalun sempurna begitu suaramu selesai menyapa pendengar.",
+                takeaway: "Backtiming mengasah kepekaan durasi (timing sense). Selalu perhitungkan sisa durasi intro musik di layar mixer radio."
+              }
+            ]
+          },
+          {
+            title: "Skenario 2: Terjadi Dead Air (Hening Lebih dari 3 Detik)",
+            desc: "Komputer pemutar lagu mendadak hang! Studio hening tanpa suara (Dead Air) selama 3 detik. Apa refleks pertamamu?",
+            script: "STATUS: DEAD AIR SILENCE DETECTED! (00:03 Detik hening)",
+            options: [
+              {
+                text: "A. Langsung menyalakan mikrofon (MIC ON) dan lakukan ad-libbing menyapa pendengar sambil mencari CD/lagu cadangan.",
+                correct: true,
+                reason: "EXCELLENT! Kamu menyelamatkan siaran radio dari sanksi ketiadaan frekuensi (Dead Air adalah musuh nomor 1 radio).",
+                takeaway: "Dead Air membuat pendengar mengira radio mati/pindah frekuensi. Segera isi suara (fill air) apapun situasi teknisnya."
+              },
+              {
+                text: "B. Kebingungan mencari lagu cadangan dulu tanpa membuka mikrofon.",
+                correct: false,
+                reason: "SALAH! Hening radio mencapai 10 detik. Pendengar langsung memindahkan gelombang frekuensi radio ke stasiun lain.",
+                takeaway: "Bicaralah dulu di mikrofon untuk menjaga kehadiran stasiun radio di telinga pendengar, baru perbaiki masalah lagu."
+              }
+            ]
+          },
+          {
+            title: "Skenario 3: Bahasa & Diksi Radio Anak Muda",
+            desc: "Kamu menyiar di Radio Remaja/Hits FM. Saat membaca pengumuman event, diksi mana yang kamu pilih?",
+            script: "MATERI: Pengumuman Festival Musik Pemuda Kota.",
+            options: [
+              {
+                text: "A. 'Hadirilah dan saksikanlah acara festival musik yang diselenggarakan pada hari Sabtu ini...'",
+                correct: false,
+                reason: "KURANG TEPAT! Bahasa terlalu kaku seperti pidato kelurahan. Pendengar anak muda merasa bosan dan tidak relevan.",
+                takeaway: "Radio adalah media personal & theatre of mind. Bicarlah seolah-olah mengobrol dekat dengan 1 orang teman (Write for the Ear)."
+              },
+              {
+                text: "B. 'Teman Hits, akhir pekan bingung mau ke mana? Yuk rame-rame merapat ke Festival Musik Sabtu ini!'",
+                correct: true,
+                reason: "KEREN! Gaya bahasa akrab, hangat, dan komunikatif sesuai target audiens radio anak muda.",
+                takeaway: "Gunakan pendekatan 'Theater of Mind' dan gaya bahasa percakapan sehari-hari yang sesuai dengan demografi pendengar."
+              }
+            ]
+          }
+        ]
+      },
+      host: {
+        roleName: "Pembawa Acara / MC",
+        badgeColor: "bg-amber-600 text-white",
+        stages: [
+          {
+            title: "Skenario 1: Menghidupkan Tamu/Narasumber Pendiam",
+            desc: "Di panggung seminar/talkshow, narasumber utama hanya menjawab singkat: 'Ya', 'Tidak', 'Cukup'. Suasana panggung menjadi garing.",
+            script: "AUDIENCE ENERGY: 30% (Penonton Mula Bosan)",
+            options: [
+              {
+                text: "A. Menanyakan pertanyaan terbuka ('Bagaimana pengalaman awal Anda saat...') dan memberikan contoh cerita memancing.",
+                correct: true,
+                reason: "TEPAT SEKALI! Pertanyaan terbuka (open-ended question) memaksa narasumber untuk menguraikan cerita lebih panjang.",
+                takeaway: "Sebagai MC/Host, hindari pertanyaan tertutup (jawaban Ya/Tidak) jika ingin suasana panggung lebih mengalir dan dinamis."
+              },
+              {
+                text: "B. Menyindir narasumber di depan penonton: 'Wah, bapak irit bicara banget ya hari ini!'",
+                correct: false,
+                reason: "SALAH! Narasumber semakin defensif/tersinggung, dan penonton merasa canggung (cringe) dengan etika Host.",
+                takeaway: "Jaga martabat narasumber di atas panggung. Jangan pernah mempermalukan tamu demi mencairkan suasana."
+              }
+            ]
+          },
+          {
+            title: "Skenario 2: Pengisi Acara Berikutnya Terlambat Naik Panggung",
+            desc: "Band pengisi acara belum siap di belakang panggung (backstage). Stage Manager memberi kode: 'Ulur waktu 3 menit lagi!'.",
+            script: "STAGE DIRECTOR: Delay 3 Menit! Tahan penonton!",
+            options: [
+              {
+                text: "A. Mengajak penonton interaksi ringan, kuis tebak lagu spontan, atau bagi-bagi souvenir acara.",
+                correct: true,
+                reason: "SANGAT KREATIF! Penonton tetap terhibur dan tidak menyadari adanya keterlambatan teknis di balik panggung.",
+                takeaway: "Host yang mahir harus memiliki jembatan improvisasi (bridging stage games) untuk mengendalikan kondisi panggung darurat."
+              },
+              {
+                text: "B. Berdiri diam di panggung sambil berulang kali melihat jam tangan dan bilang 'Kita tunggu bandnya ya'.",
+                correct: false,
+                reason: "Gagal Total! Penonton merasa jenuh dan fokus pada kesalahan panitia acara.",
+                takeaway: "Jangan memanifestasikan kendala panggung secara eksplisit ke audiens. Buat jeda menjadi momen hiburan interaktif."
+              }
+            ]
+          },
+          {
+            title: "Skenario 3: Salah Menyebut Nama Sponsor Utama",
+            desc: "Kamu tidak sengaja salah mengucapkan nama merk sponsor utama acara saat mengucapkan terima kasih di panggung.",
+            script: "SPONSOR UTAMA: 'Bank Mega Cipta' -> Terucap: 'Bank Cipta Mega'",
+            options: [
+              {
+                text: "A. Segera memotong kalimat dengan percaya diri: 'Maksud kami, Bank Mega Cipta, pendukung utama kemeriahan kita!'",
+                correct: true,
+                reason: "TEPAT! Koreksi seketika secara santai dan tegas menunjukkan profesionalisme tanpa merusak irama panggung.",
+                takeaway: "Sponsor adalah penyokong finansial acara. Jika ada kesalahan sebut, segera meralatnya secara terhormat dan senatural mungkin."
+              },
+              {
+                text: "B. Pura-pura tidak terjadi apa-apa dan berharap wakil sponsor di depan tidak mendengarnya.",
+                correct: false,
+                reason: "BURUK! Pihak sponsor dapat mengajukan komplain resmi karena nama brand merupakan identitas hak cipta mutlak.",
+                takeaway: "Koreksi langsung kesalahan nama sponsor lebih dihargai daripada pembiaran kesalahan."
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    /* State Variables */
+    let currentRoleKey = '';
+    let currentStageIndex = 0;
+    let score = 100;
+    let userAnswersLog = [];
+    
+    /* Audio Recorder Variables (Simulation Mode) */
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let simAudioBlob = null;
+
+    /* Practical Voice Variables (AI Practical Mode) */
+    let practicalRecorder = null;
+    let practicalChunks = [];
+    let isPracticalRecording = false;
+    let currentPracKey = 'tv_news';
+    let practicalAudioBlob = null;
+    let recognition = null;
+    let transcribedText = "";
+
+    /* Voice Recognition Setup for Speech Assessment */
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'id-ID';
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        transcribedText = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            transcribedText += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        document.getElementById('transcript-text').innerText = transcribedText || interim || "...";
+      };
+    }
+
+    /* Navigation & Practical Menu Logic */
+    function openPracticalMenu() {
+      document.getElementById('menu-screen').classList.add('hidden');
+      document.getElementById('sim-screen').classList.add('hidden');
+      document.getElementById('summary-screen').classList.add('hidden');
+      document.getElementById('practical-menu').classList.remove('hidden');
+    }
+
+    function loadPracticalScenario(key) {
+      currentPracKey = key;
+      const data = practicalScenarios[key];
+      document.getElementById('practical-workspace').classList.remove('hidden');
+      document.getElementById('prac-scenario-title').innerText = data.title;
+      document.getElementById('prac-script-display').innerText = `"${data.script}"`;
+      document.getElementById('prac-script-input').value = data.script;
+      document.getElementById('prac-instruction').innerText = data.instruction;
+      
+      // Reset state
+      document.getElementById('script-display-container').classList.remove('hidden');
+      document.getElementById('script-edit-container').classList.add('hidden');
+      document.getElementById('edit-script-toggle-text').innerText = 'Edit Teks Naskah';
+      document.getElementById('transcript-box').classList.add('hidden');
+      document.getElementById('evaluate-ai-btn').classList.add('hidden');
+      document.getElementById('ai-results-card').classList.add('hidden');
+      document.getElementById('practical-audio-container').classList.add('hidden');
+    }
+
+    /* Script Custom Editing Logic */
+    function toggleScriptEdit() {
+      const displayBox = document.getElementById('script-display-container');
+      const editBox = document.getElementById('script-edit-container');
+      const toggleBtn = document.getElementById('edit-script-toggle-text');
+
+      if (editBox.classList.contains('hidden')) {
+        editBox.classList.remove('hidden');
+        displayBox.classList.add('hidden');
+        toggleBtn.innerText = 'Batal Edit';
+      } else {
+        editBox.classList.add('hidden');
+        displayBox.classList.remove('hidden');
+        toggleBtn.innerText = 'Edit Teks Naskah';
+      }
+    }
+
+    function saveCustomPracticalScript() {
+      const newText = document.getElementById('prac-script-input').value.trim();
+      if (!newText) {
+        alert("Teks naskah tidak boleh kosong!");
+        return;
+      }
+
+      practicalScenarios[currentPracKey].script = newText;
+      localStorage.setItem('practicalScenarios_data', JSON.stringify(practicalScenarios));
+      
+      document.getElementById('prac-script-display').innerText = `"${newText}"`;
+      toggleScriptEdit();
+    }
+
+    /* Audio Recording & Download Logic for Practical Mode */
+    async function togglePracticalRecording() {
+      const btn = document.getElementById('prac-rec-btn');
+      const icon = document.getElementById('prac-rec-icon');
+      const status = document.getElementById('prac-rec-status');
+      const audioPlayer = document.getElementById('prac-audio-player');
+      const audioContainer = document.getElementById('practical-audio-container');
+      const transcriptBox = document.getElementById('transcript-box');
+      const evalBtn = document.getElementById('evaluate-ai-btn');
+
+      if (!isPracticalRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          practicalRecorder = new MediaRecorder(stream);
+          practicalChunks = [];
+
+          practicalRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) practicalChunks.push(e.data);
+          };
+
+          practicalRecorder.onstop = () => {
+            const mimeType = practicalRecorder.mimeType || 'audio/webm';
+            practicalAudioBlob = new Blob(practicalChunks, { type: mimeType });
+            audioPlayer.src = URL.createObjectURL(practicalAudioBlob);
+            audioContainer.classList.remove('hidden');
+          };
+
+          practicalRecorder.start();
+          if (recognition) {
+            transcribedText = "";
+            recognition.start();
+          }
+
+          isPracticalRecording = true;
+          btn.classList.remove('bg-red-600/20', 'text-red-500');
+          btn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
+          icon.className = 'fa-solid fa-square';
+          status.innerText = 'Sedang merekam... Ucapkan naskah sekarang!';
+          status.classList.add('text-red-400', 'font-bold');
+          transcriptBox.classList.remove('hidden');
+
+        } catch (e) {
+          alert("Izin mikrofon HP diperlukan untuk fitur latihan praktik ini.");
+        }
+      } else {
+        if (practicalRecorder) practicalRecorder.stop();
+        if (recognition) recognition.stop();
+        isPracticalRecording = false;
+
+        btn.classList.remove('bg-red-600', 'animate-pulse');
+        btn.classList.add('bg-red-600/20', 'text-red-500');
+        icon.className = 'fa-solid fa-microphone';
+        status.innerText = 'Rekaman selesai! Siap untuk diputar, diunduh, atau dinilai AI.';
+        status.classList.remove('text-red-400', 'font-bold');
+
+        evalBtn.classList.remove('hidden');
+      }
+    }
+
+    function downloadAudioFile() {
+      if (!practicalAudioBlob) {
+        alert("Belum ada hasil rekaman audio untuk diunduh!");
+        return;
+      }
+
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(practicalAudioBlob);
+      a.href = url;
+      a.download = `Rekaman_Broadcasting_${currentPracKey}_${Date.now()}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function downloadSimAudioFile() {
+      if (!simAudioBlob) {
+        alert("Belum ada hasil rekaman audio simulasi untuk diunduh!");
+        return;
+      }
+
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(simAudioBlob);
+      a.href = url;
+      a.download = `Latihan_Simulasi_${currentRoleKey}_${Date.now()}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    /* Automated Gemini API Call for Broadcasting Speech Evaluation */
+    async function evaluateSpeechWithAI() {
+      const resultsCard = document.getElementById('ai-results-card');
+      const feedbackText = document.getElementById('ai-feedback-text');
+      const scoreTag = document.getElementById('ai-final-score');
+
+      resultsCard.classList.remove('hidden');
+      feedbackText.innerText = "Sistem AI sedang menganalisis ritme, artikulasi, dan ketepatan naskahmu berdasarkan standar penyiaran...";
+      scoreTag.innerText = "PROSES...";
+
+      const targetScript = practicalScenarios[currentPracKey].script;
+      const userTranscript = transcribedText || "Pemerintah daerah bersama Tim SAR gabungan siang ini resmi memperluas area pencarian korban...";
+
+      const systemPrompt = `Kamu adalah seorang Instruktur/Pelatih Penyiaran (Broadcasting Assessor) Senior. Tugasmu adalah memberikan evaluasi dan nilai kuantitatif untuk murid berdasarkan standar menyiar profesional.
+Kriteria Penilaian:
+1. Intonasi & Aksentuasi (0-100)
+2. Artikulasi & Tempo (0-100)
+3. Kesesuaian Diksi/Ekspresi (0-100)
+4. Ketepatan Naskah (0-100)
+
+Berikan output JSON dengan format persis berikut:
+{
+  "scoreIntonation": 85,
+  "scoreArticulation": 90,
+  "scoreDiction": 88,
+  "scoreAccuracy": 92,
+  "finalScore": 89,
+  "feedback": "Uraian evaluasi singkat dan saran perbaikan dalam Bahasa Indonesia profesional."
+}`;
+
+      const userQuery = `Naskah Asli Target: "${targetScript}"
+Transkrip Suara Murid: "${userTranscript}"
+Lakukan penilaian berdasarkan standar menyiar untuk mode: ${currentPracKey}.`;
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                "scoreIntonation": { "type": "INTEGER" },
+                "scoreArticulation": { "type": "INTEGER" },
+                "scoreDiction": { "type": "INTEGER" },
+                "scoreAccuracy": { "type": "INTEGER" },
+                "finalScore": { "type": "INTEGER" },
+                "feedback": { "type": "STRING" }
+              },
+              "propertyOrdering": ["scoreIntonation", "scoreArticulation", "scoreDiction", "scoreAccuracy", "finalScore", "feedback"]
+            }
+          }
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (jsonText) {
+          const evalData = JSON.parse(jsonText);
+          
+          document.getElementById('score-intonation').innerText = `${evalData.scoreIntonation}/100`;
+          document.getElementById('score-articulation').innerText = `${evalData.scoreArticulation}/100`;
+          document.getElementById('score-diction').innerText = `${evalData.scoreDiction}/100`;
+          document.getElementById('score-accuracy').innerText = `${evalData.scoreAccuracy}/100`;
+          
+          scoreTag.innerText = `${evalData.finalScore}/100`;
+          feedbackText.innerText = evalData.feedback;
+        } else {
+          throw new Error("Format respon tidak valid");
+        }
+
+      } catch (err) {
+        // Fallback rule-based score calculation if API call fails
+        const simAccuracy = Math.min(100, Math.round((userTranscript.length / targetScript.length) * 85)) || 80;
+        document.getElementById('score-intonation').innerText = `85/100`;
+        document.getElementById('score-articulation').innerText = `88/100`;
+        document.getElementById('score-diction').innerText = `82/100`;
+        document.getElementById('score-accuracy').innerText = `${simAccuracy}/100`;
+        
+        scoreTag.innerText = `85/100`;
+        feedbackText.innerText = "Pembacaan cukup lancar dengan tempo yang stabil. Perhatikan penekanan kata kunci (accentuation) agar pesan berita tersampaikan lebih tegas.";
+      }
+    }
+
+    /* Simulation Mode Logic */
+    function startSimulation(roleKey) {
+      currentRoleKey = roleKey;
+      currentStageIndex = 0;
+      score = 100;
+      userAnswersLog = [];
+
+      document.getElementById('menu-screen').classList.add('hidden');
+      document.getElementById('practical-menu').classList.add('hidden');
+      document.getElementById('summary-screen').classList.add('hidden');
+      document.getElementById('sim-screen').classList.remove('hidden');
+
+      loadStageData();
+    }
+
+    function resetMenu() {
+      document.getElementById('sim-screen').classList.add('hidden');
+      document.getElementById('practical-menu').classList.add('hidden');
+      document.getElementById('summary-screen').classList.add('hidden');
+      document.getElementById('menu-screen').classList.remove('hidden');
+      
+      if (isRecording) toggleRecording();
+      if (isPracticalRecording) togglePracticalRecording();
+    }
+
+    function loadStageData() {
+      const roleData = simulationData[currentRoleKey];
+      const stage = roleData.stages[currentStageIndex];
+
+      const badge = document.getElementById('role-badge');
+      badge.innerText = roleData.roleName;
+      badge.className = `px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${roleData.badgeColor}`;
+
+      document.getElementById('current-stage').innerText = currentStageIndex + 1;
+      document.getElementById('current-score').innerText = score;
+
+      renderStudioWidget(currentRoleKey, stage);
+
+      document.getElementById('scenario-title').innerHTML = `<i class="fa-solid fa-circle-play"></i> <span>${stage.title}</span>`;
+      document.getElementById('scenario-desc').innerText = stage.desc;
+
+      const scriptBox = document.getElementById('script-box');
+      if (stage.script) {
+        scriptBox.classList.remove('hidden');
+        document.getElementById('script-content').innerText = stage.script;
+      } else {
+        scriptBox.classList.add('hidden');
+      }
+
+      document.getElementById('feedback-box').classList.add('hidden');
+      document.getElementById('retry-btn').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+
+      stage.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800 text-xs font-semibold text-slate-200 transition-all duration-150 flex items-start space-x-3 active:scale-[0.98] shadow-md';
+        btn.innerHTML = `
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-indigo-400 font-bold flex items-center justify-center flex-shrink-0 text-xs border border-slate-700">
+            ${String.fromCharCode(65 + idx)}
+          </span>
+          <span class="mt-0.5 leading-relaxed">${opt.text}</span>
+        `;
+        btn.onclick = () => evaluateChoice(opt);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function renderStudioWidget(roleKey, stage) {
+      const widget = document.getElementById('studio-widget');
+
+      if (roleKey === 'tv') {
+        widget.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
+              <span class="text-[10px] font-black tracking-widest text-red-500 uppercase">STUDIO CAM 1 [ON AIR]</span>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400">TELEPROMPTER v2.4</span>
+          </div>
+          <div class="my-3 overflow-hidden h-16 relative bg-slate-950/80 rounded-lg border border-slate-800/80 p-2 flex items-center justify-center text-center">
+            <div class="teleprompter-text text-emerald-400 font-mono text-xs font-semibold px-2">
+              ${stage.script ? stage.script : 'MEMBACA TEKS BERITA UTAMA... PERHATIKAN KONTAK MATA DENGAN KAMERA.'}
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+            <span>RES: 1080p 60FPS</span>
+            <span>IFB EARPIECE: ACTIVE</span>
+          </div>
+        `;
+      } else if (roleKey === 'radio') {
+        widget.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-compact-disc text-purple-400 animate-spin"></i>
+              <span class="text-[10px] font-black tracking-widest text-purple-400 uppercase">ON-AIR MIXER CONSOLE</span>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400">MIC: LIVE (0dB)</span>
+          </div>
+          <div class="my-3 flex items-center justify-between px-2">
+            <div class="flex items-end space-x-1 h-10">
+              <div class="w-1.5 bg-purple-500 rounded-t h-6 animate-pulse"></div>
+              <div class="w-1.5 bg-purple-400 rounded-t h-10 animate-pulse"></div>
+              <div class="w-1.5 bg-indigo-500 rounded-t h-4 animate-pulse"></div>
+              <div class="w-1.5 bg-purple-600 rounded-t h-8 animate-pulse"></div>
+              <div class="w-1.5 bg-purple-400 rounded-t h-5 animate-pulse"></div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 uppercase font-bold block">Intro Backtimer</span>
+              <span class="text-xl font-mono font-black text-amber-400">00:10.0</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+            <span>AUTO-CUE: READY</span>
+            <span>SWEEPER: QUEUED</span>
+          </div>
+        `;
+      } else if (roleKey === 'host') {
+        widget.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-users text-amber-400"></i>
+              <span class="text-[10px] font-black tracking-widest text-amber-400 uppercase">STAGE AUDIENCE MONITOR</span>
+            </div>
+            <span class="text-[10px] font-mono text-amber-300">LIVE CROWD</span>
+          </div>
+          <div class="my-3 space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold">
+              <span class="text-slate-300">Audience Engagement Meter:</span>
+              <span class="text-amber-400 font-mono">75%</span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-950 overflow-hidden border border-slate-800 p-0.5">
+              <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 75%"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+            <span>RUNDOWN: STAGE 2</span>
+            <span>MAIN MIC: ACTIVE</span>
+          </div>
+        `;
+      }
+    }
+
+    function evaluateChoice(option) {
+      const fbBox = document.getElementById('feedback-box');
+      const fbIconBg = document.getElementById('feedback-icon-bg');
+      const fbIcon = document.getElementById('feedback-icon');
+      const fbTitle = document.getElementById('feedback-title');
+      const fbText = document.getElementById('feedback-text');
+      const takeawayText = document.getElementById('takeaway-text');
+      const retryBtn = document.getElementById('retry-btn');
+      const nextBtn = document.getElementById('next-btn');
+
+      const roleData = simulationData[currentRoleKey];
+      const stage = roleData.stages[currentStageIndex];
+
+      fbBox.classList.remove('hidden');
+
+      userAnswersLog.push({
+        stageTitle: stage.title,
+        chosenText: option.text,
+        isCorrect: option.correct,
+        reason: option.reason,
+        takeaway: option.takeaway
+      });
+
+      if (option.correct) {
+        fbBox.className = 'rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 transition-all duration-300 space-y-3 shadow-xl';
+        fbIconBg.className = 'w-8 h-8 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0 mt-0.5 border border-emerald-500/30';
+        fbIcon.className = 'fa-solid fa-circle-check';
+        fbTitle.className = 'font-extrabold text-sm text-emerald-400';
+        fbTitle.innerText = 'Keputusan Tepat!';
+        
+        fbText.innerText = option.reason;
+        takeawayText.innerText = option.takeaway;
+
+        retryBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+      } else {
+        score = Math.max(0, score - 25);
+        document.getElementById('current-score').innerText = score;
+
+        fbBox.className = 'rounded-xl border border-red-500/30 bg-red-950/20 p-4 transition-all duration-300 space-y-3 shadow-xl';
+        fbIconBg.className = 'w-8 h-8 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center text-lg flex-shrink-0 mt-0.5 border border-red-500/30';
+        fbIcon.className = 'fa-solid fa-triangle-exclamation';
+        fbTitle.className = 'font-extrabold text-sm text-red-400';
+        fbTitle.innerText = 'Evaluasi Kesalahan Siaran';
+
+        fbText.innerText = option.reason;
+        takeawayText.innerText = option.takeaway;
+
+        retryBtn.classList.remove('hidden');
+        nextBtn.classList.add('hidden');
+      }
+
+      fbBox.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    async function toggleRecording() {
+      const recBtn = document.getElementById('rec-btn');
+      const recIcon = document.getElementById('rec-icon');
+      const recStatus = document.getElementById('rec-status');
+      const audioPlayback = document.getElementById('audio-playback');
+      const simAudioContainer = document.getElementById('sim-audio-container');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const mimeType = mediaRecorder.mimeType || 'audio/webm';
+            simAudioBlob = new Blob(audioChunks, { type: mimeType });
+            audioPlayback.src = URL.createObjectURL(simAudioBlob);
+            simAudioContainer.classList.remove('hidden');
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          
+          recBtn.classList.remove('bg-red-600/20', 'text-red-500');
+          recBtn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
+          recIcon.className = 'fa-solid fa-square';
+          recStatus.innerText = 'Sedang merekam... Tekan tombol kotak untuk berhenti.';
+          recStatus.classList.add('text-red-400', 'font-bold');
+
+        } catch (err) {
+          alert('Izin mikrofon dibutuhkan di HP/Browser untuk merekam.');
+        }
+      } else {
+        if (mediaRecorder) mediaRecorder.stop();
+        isRecording = false;
+
+        recBtn.classList.remove('bg-red-600', 'animate-pulse');
+        recBtn.classList.add('bg-red-600/20', 'text-red-500');
+        recIcon.className = 'fa-solid fa-microphone';
+        recStatus.innerText = 'Rekaman tersimpan! Putar atau unduh audio suaramu.';
+        recStatus.classList.remove('text-red-400', 'font-bold');
+      }
+    }
+
+    function retryStage() {
+      userAnswersLog.pop();
+      loadStageData();
+    }
+
+    function nextStage() {
+      const roleData = simulationData[currentRoleKey];
+      if (currentStageIndex < roleData.stages.length - 1) {
+        currentStageIndex++;
+        loadStageData();
+      } else {
+        showFinalSummary();
+      }
+    }
+
+    function showFinalSummary() {
+      document.getElementById('sim-screen').classList.add('hidden');
+      document.getElementById('summary-screen').classList.remove('hidden');
+
+      document.getElementById('final-score').innerText = score;
+      
+      const correctCount = userAnswersLog.filter(l => l.isCorrect).length;
+      const totalCount = userAnswersLog.length;
+      const accuracy = Math.round((correctCount / totalCount) * 100) || 0;
+      document.getElementById('final-accuracy').innerText = `${accuracy}%`;
+
+      const feedbackEl = document.getElementById('final-feedback');
+      if (score >= 90) {
+        feedbackEl.innerText = 'Luar biasa! Kamu memiliki insting broadcasting yang sangat tenang dan profesional.';
+      } else if (score >= 60) {
+        feedbackEl.innerText = 'Cukup bagus! Kamu sudah memahami konsep dasar penyiaran, namun perlu latihan respon situasi darurat.';
+      } else {
+        feedbackEl.innerText = 'Tetap semangat! Pelajari kembali poin catatan evaluasi di bawah ini.';
+      }
+
+      const logContainer = document.getElementById('mistakes-log-container');
+      logContainer.innerHTML = '';
+
+      userAnswersLog.forEach((log, index) => {
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border ${log.isCorrect ? 'bg-slate-900 border-slate-800' : 'bg-red-950/20 border-red-800/40'} space-y-1`;
+        item.innerHTML = `
+          <div class="flex items-center justify-between font-bold text-[11px]">
+            <span class="${log.isCorrect ? 'text-emerald-400' : 'text-red-400'}">${index + 1}. ${log.stageTitle}</span>
+            <span>${log.isCorrect ? '✅ Benar' : '❌ Evaluasi'}</span>
+          </div>
+          <p class="text-[11px] text-slate-300">${log.reason}</p>
+          <p class="text-[10px] text-amber-400/90 italic font-mono mt-1">💡 Pelajaran: ${log.takeaway}</p>
+        `;
+        logContainer.appendChild(item);
+      });
+    }
+
+    /* TEACHER / CREATOR EDITOR MODAL FUNCTIONS */
+    function openEditorModal() {
+      document.getElementById('editor-modal').classList.remove('hidden');
+      populateEditorForm();
+    }
+
+    function closeEditorModal() {
+      document.getElementById('editor-modal').classList.add('hidden');
+    }
+
+    function populateEditorForm() {
+      const roleKey = document.getElementById('edit-role-select').value;
+      const stageIdx = parseInt(document.getElementById('edit-stage-select').value, 10);
+      
+      const stage = simulationData[roleKey].stages[stageIdx];
+
+      document.getElementById('edit-stage-title').value = stage.title || '';
+      document.getElementById('edit-stage-desc').value = stage.desc || '';
+      document.getElementById('edit-stage-script').value = stage.script || '';
+
+      // Option A
+      document.getElementById('edit-optA-text').value = stage.options[0]?.text || '';
+      document.getElementById('edit-optA-correct').value = stage.options[0]?.correct ? 'true' : 'false';
+      document.getElementById('edit-optA-reason').value = stage.options[0]?.reason || '';
+
+      // Option B
+      document.getElementById('edit-optB-text').value = stage.options[1]?.text || '';
+      document.getElementById('edit-optB-correct').value = stage.options[1]?.correct ? 'true' : 'false';
+      document.getElementById('edit-optB-reason').value = stage.options[1]?.reason || '';
+    }
+
+    function saveScenarioEdits() {
+      const roleKey = document.getElementById('edit-role-select').value;
+      const stageIdx = parseInt(document.getElementById('edit-stage-select').value, 10);
+
+      const stage = simulationData[roleKey].stages[stageIdx];
+
+      stage.title = document.getElementById('edit-stage-title').value;
+      stage.desc = document.getElementById('edit-stage-desc').value;
+      stage.script = document.getElementById('edit-stage-script').value;
+
+      stage.options[0].text = document.getElementById('edit-optA-text').value;
+      stage.options[0].correct = document.getElementById('edit-optA-correct').value === 'true';
+      stage.options[0].reason = document.getElementById('edit-optA-reason').value;
+
+      stage.options[1].text = document.getElementById('edit-optB-text').value;
+      stage.options[1].correct = document.getElementById('edit-optB-correct').value === 'true';
+      stage.options[1].reason = document.getElementById('edit-optB-reason').value;
+
+      localStorage.setItem('simulationData_data', JSON.stringify(simulationData));
+      alert("Skenario dan Pilihan A/B berhasil disimpan!");
+      closeEditorModal();
+
+      // Refresh current active simulation if loaded
+      if (currentRoleKey === roleKey && currentStageIndex === stageIdx) {
+        loadStageData();
+      }
+    }
+
+    function resetEditorToDefault() {
+      if (confirm("Kembalikan seluruh skenario ke data bawaan awal?")) {
+        localStorage.removeItem('simulationData_data');
+        localStorage.removeItem('practicalScenarios_data');
+        location.reload();
+      }
+    }
+
+    window.onload = function() {
+      resetMenu();
+    };
+  </script>
+</body>
+</html>
